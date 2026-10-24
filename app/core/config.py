@@ -17,6 +17,12 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://rag:rag@localhost:5433/rag"
     db_connect_timeout_seconds: int = 3
 
+    # Ingestion limits (phase 2). Sizes are in bytes; chunk sizes are in characters.
+    max_upload_bytes: int = 10 * 1024 * 1024
+    default_chunk_size: int = 800
+    default_chunk_overlap: int = 120
+    max_chunk_size: int = 4000
+
     # Optional at startup: only required once /query is called (phase 4).
     anthropic_api_key: SecretStr | None = None
     llm_model: str = "claude-haiku-5-5"
