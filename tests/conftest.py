@@ -63,8 +63,12 @@ def clean_database(migrated_database: str) -> Iterator[str]:
 def make_client(clean_database: str) -> Iterator[Callable[..., TestClient]]:
     clients: list[TestClient] = []
 
-    def _make(**overrides: object) -> TestClient:
-        settings = Settings(_env_file=None, database_url=clean_database, **overrides)
+    def _make(database_url: str | None = None, **overrides: object) -> TestClient:
+        settings = Settings(
+            _env_file=None,
+            database_url=database_url or clean_database,
+            **overrides,
+        )
         client = TestClient(create_app(settings))
         clients.append(client)
         return client
@@ -72,6 +76,8 @@ def make_client(clean_database: str) -> Iterator[Callable[..., TestClient]]:
     yield _make
     for client in clients:
         client.close()
+        # The app creates its engine eagerly; release its pooled connections.
+        client.app.state.engine.dispose()
 
 
 @pytest.fixture
