@@ -1,0 +1,9 @@
+"""FastAPI dependencies shared by the routers."""
+
+from fastapi import Request
+from sqlalchemy import Engine
+
+
+def get_engine(request: Request) -> Engine:
+    engine: Engine = request.app.state.engine
+    return engine
